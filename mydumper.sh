@@ -13,17 +13,17 @@ set -o pipefail
 lockFile="/var/lock/mydumper-pull.lock"
 errorFile="/var/log/mysql/mydumper.err"
 logFile="/var/log/mysql/mydumper.log"
-mysqlUser=root
-mysqlPort=3306
+mysqlUser="${mysqlUser:-root}"
+mysqlPort="${mysqlPort:-3306}"
 #remoteHost=192.168.1.105
-remoteHost=localhost
-backupPath="/root/backups/$(date +%Y%m%d)/"
-numberThreads=4
+remoteHost="${remoteHost:-localhost}"
+backupPath="${backupPath:-/root/backups/$(date +%Y%m%d)/}"
+numberThreads="${numberThreads:-4}"
 # Retention times #
-weekly=4
-daily=7
+weekly="${weekly:-4}"
+daily="${daily:-7}"
 ######
-email="root@localhost"
+email="${email:-root@localhost}"
 
 # Function definitions
 
