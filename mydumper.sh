@@ -161,6 +161,6 @@ function removeOldBackup () {
 }
 
 setLockFile
-runMysqldump
+#runMysqldump
 runMydumper
 removeOldBackup
