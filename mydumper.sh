@@ -17,7 +17,8 @@ mysqlUser="${mysqlUser:-root}"
 mysqlPort="${mysqlPort:-3306}"
 #remoteHost=192.168.1.105
 remoteHost="${remoteHost:-localhost}"
-backupPath="${backupPath:-/root/backups/$(date +%Y%m%d)/}"
+backupPathBase="${backupPathBase:-/root/backups/}"
+backupPath="${backupPathBase}/$(date +%Y%m%d)/"
 numberThreads="${numberThreads:-4}"
 # Retention times #
 weekly="${weekly:-4}"
