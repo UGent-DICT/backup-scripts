@@ -4,7 +4,7 @@
 # Daniel Guzman Burgos <daniel.guzman.burgos@percona.com>
 #
 
-clear
+#clear
 
 set -o pipefail
 
