@@ -21,6 +21,7 @@ remoteHost="${remoteHost:-localhost}"
 backupPathBase="${backupPathBase:-/root/backups}"
 backupPath="${backupPathBase}/$(date +%Y%m%d)/"
 numberThreads="${numberThreads:-4}"
+compressOutput="${compressOutput:-true}"
 # Retention times #
 weekly="${weekly:-4}"
 daily="${daily:-7}"
@@ -92,10 +93,18 @@ function runMysqldump () {
 	verifyExecution "$?" "Can't create backup dir $backupPath. $out" true
 	logInfo "[Info] $backupPath exists"
 
+        if [ "$compressOutput" == "true" ]; then
+		compressionHandler="gzip"
+		compressionExt=".gz"
+	else
+		compressionHandler="cat"
+		compressionExt=""
+	fi
+
 	local schemas=$(mysql -u${mysqlUser} -h${remoteHost} --port=${mysqlPort} -N -e"select schema_name from information_schema.schemata where schema_name not in ('information_schema', 'performance_schema', 'sys')")
 	if [ ! -z "$schemas" ]; then
 		for i in $schemas; do
-			out=$(mysqldump -u${mysqlUser} -h${remoteHost} --port=${mysqlPort} --set-gtid-purged=${gtidPurged} -d $i | gzip > $backupPath/${i}_schema.sql.gz 2>&1)
+			out=$(mysqldump -u${mysqlUser} -h${remoteHost} --port=${mysqlPort} --set-gtid-purged=${gtidPurged} -d $i | ${compressionHandler} > $backupPath/${i}_schema.sql${compressionExt} 2>&1)
 			verifyExecution "$?" "Problems dumping schema for db $i. $out"
 			logInfo "[OK] Dumping $i schema with mysqldump"
 		done
@@ -115,7 +124,14 @@ function runMydumper () {
 
 	verifyMydumperBin
 	logInfo "[Info] Dumping data with MyDumper.....start"
-	out=$(mydumper --user=${mysqlUser} --outputdir=${backupPath} --host=${remoteHost} --port=${mysqlPort} --threads=${numberThreads} --compress --kill-long-queries --no-schemas --verbose=3 &>> $logFile)
+
+	if [ "$compressOutput" == "true" ]; then
+		compressionOpt="--compress"
+	else
+		compressionOpt=""
+	fi
+
+	out=$(mydumper --user=${mysqlUser} --outputdir=${backupPath} --host=${remoteHost} --port=${mysqlPort} --threads=${numberThreads} ${compressionOpt} --kill-long-queries --no-schemas --verbose=3 &>> $logFile)
 	verifyExecution "$?" "Couldn't execute MyDumper. $out" true
 
 	logInfo "[Info] Dumping data with MyDumper.....end"
