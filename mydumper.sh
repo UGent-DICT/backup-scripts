@@ -91,7 +91,7 @@ function runMysqldump () {
 	verifyExecution "$?" "Can't create backup dir $backupPath. $out" true
 	logInfo "[Info] $backupPath exists"
 
-	local schemas=$(mysql -u${mysqlUser} -h${remoteHost} --port=${mysqlPort} -N -e"select schema_name from information_schema.schemata where schema_name not in ('information_schema', 'performance_schema')")
+	local schemas=$(mysql -u${mysqlUser} -h${remoteHost} --port=${mysqlPort} -N -e"select schema_name from information_schema.schemata where schema_name not in ('information_schema', 'performance_schema', 'sys')")
 	if [ ! -z "$schemas" ]; then
 		for i in $schemas; do
 			out=$(mysqldump -u${mysqlUser} -h${remoteHost} --port=${mysqlPort} -d $i | gzip > $backupPath/${i}_schema.sql.gz 2>&1)
