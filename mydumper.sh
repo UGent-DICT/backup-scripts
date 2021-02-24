@@ -15,6 +15,7 @@ errorFile="/var/log/mysql/mydumper.err"
 logFile="/var/log/mysql/mydumper.log"
 mysqlUser="${mysqlUser:-root}"
 mysqlPort="${mysqlPort:-3306}"
+gtidPurged="${gtidPurged:-OFF}"
 #remoteHost=192.168.1.105
 remoteHost="${remoteHost:-localhost}"
 backupPathBase="${backupPathBase:-/root/backups}"
@@ -94,7 +95,7 @@ function runMysqldump () {
 	local schemas=$(mysql -u${mysqlUser} -h${remoteHost} --port=${mysqlPort} -N -e"select schema_name from information_schema.schemata where schema_name not in ('information_schema', 'performance_schema', 'sys')")
 	if [ ! -z "$schemas" ]; then
 		for i in $schemas; do
-			out=$(mysqldump -u${mysqlUser} -h${remoteHost} --port=${mysqlPort} -d $i | gzip > $backupPath/${i}_schema.sql.gz 2>&1)
+			out=$(mysqldump -u${mysqlUser} -h${remoteHost} --port=${mysqlPort} --set-gtid-purged=${gtidPurged} -d $i | gzip > $backupPath/${i}_schema.sql.gz 2>&1)
 			verifyExecution "$?" "Problems dumping schema for db $i. $out"
 			logInfo "[OK] Dumping $i schema with mysqldump"
 		done
