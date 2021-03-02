@@ -104,7 +104,7 @@ function runMysqldump () {
 	local schemas=$(mysql -u${mysqlUser} -h${remoteHost} --port=${mysqlPort} -N -e"select schema_name from information_schema.schemata where schema_name not in ('information_schema', 'performance_schema', 'sys')")
 	if [ ! -z "$schemas" ]; then
 		for i in $schemas; do
-			out=$(mysqldump -u${mysqlUser} -h${remoteHost} --port=${mysqlPort} --set-gtid-purged=${gtidPurged} -d $i | ${compressionHandler} > $backupPath/${i}_schema.sql${compressionExt} 2>&1)
+			out=$(mysqldump -u${mysqlUser} -h${remoteHost} --port=${mysqlPort} --set-gtid-purged=${gtidPurged} --triggers --routines --events -d $i | ${compressionHandler} > $backupPath/${i}_schema.sql${compressionExt} 2>&1)
 			verifyExecution "$?" "Problems dumping schema for db $i. $out"
 			logInfo "[OK] Dumping $i schema with mysqldump"
 		done
