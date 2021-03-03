@@ -86,7 +86,7 @@ function verifyMysqldump () {
 }
 
 function runMysqldump () {
-	
+
 	verifyMysqldump
 
 	out=$(mkdir -p $backupPath)
@@ -131,7 +131,7 @@ function runMydumper () {
 		compressionOpt=""
 	fi
 
-	out=$(mydumper --user=${mysqlUser} --outputdir=${backupPath} --host=${remoteHost} --port=${mysqlPort} --threads=${numberThreads} ${compressionOpt} --kill-long-queries --no-schemas --verbose=3 &>> $logFile)
+	out=$(mydumper --user=${mysqlUser} --outputdir=${backupPath} --host=${remoteHost} --port=${mysqlPort} --threads=${numberThreads} ${compressionOpt} --kill-long-queries --triggers --events --routines --verbose=3 &>> $logFile)
 	verifyExecution "$?" "Couldn't execute MyDumper. $out" true
 
 	logInfo "[Info] Dumping data with MyDumper.....end"
@@ -179,6 +179,6 @@ function removeOldBackup () {
 }
 
 setLockFile
-runMysqldump
+#runMysqldump
 runMydumper
 removeOldBackup
